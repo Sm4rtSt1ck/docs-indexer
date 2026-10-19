@@ -62,7 +62,7 @@ Requires Python 3.12+ and running PostgreSQL and Elasticsearch (you can start ju
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 cp .env.example .env
 python -m app.load_data posts.csv
 uvicorn app.main:app --reload
@@ -75,6 +75,20 @@ Configuration via environment variables (or `.env`):
 | `DATABASE_URL` | `postgresql+asyncpg://postgres:postgres@localhost:5432/posts` |
 | `ELASTICSEARCH_URL` | `http://localhost:9200` |
 | `ELASTICSEARCH_INDEX` | `posts` |
+
+## Tests
+
+Functional tests run against real PostgreSQL and Elasticsearch, using a separate database (`posts_test`) and index (`posts_test`):
+
+```bash
+docker compose --profile test run --rm --build tests
+```
+
+Locally (with services running):
+
+```bash
+DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/posts_test ELASTICSEARCH_INDEX=posts_test pytest
+```
 
 ## Project structure
 
@@ -89,5 +103,6 @@ app/
   db.py          database helpers
   config.py      settings
   load_data.py   CSV loader
+tests/           functional tests
 docs.json        OpenAPI specification
 ```
